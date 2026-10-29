@@ -1,6 +1,8 @@
 # skills
 
-个人 Claude Code skill 合集。每个子目录一个 skill，遵循业界标准的 skill 定义（`SKILL.md` + YAML frontmatter），可直接安装到 Claude Code 使用。
+Agent skill 合集，按 **Claude Code skill 标准**（Anthropic Agent Skills 约定：目录 + `SKILL.md` + YAML frontmatter）编写。
+
+**不只是 Claude Code 能用**：skill 本质是一份 Markdown 操作规程——Claude Code 装入 `~/.claude/skills/` 后可按触发词自动加载；其他 AI 助手（Cursor / Codex / 任意 agent）把 `SKILL.md` 挂进自己的规则/提示体系同样可用，只是没有自动加载机制。
 
 ## Skills
 
