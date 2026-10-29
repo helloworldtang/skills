@@ -1,8 +1,6 @@
 # skills
 
-Agent skill 合集，按 **Claude Code skill 标准**（Anthropic Agent Skills 约定：目录 + `SKILL.md` + YAML frontmatter）编写。
-
-**不只是 Claude Code 能用**：skill 本质是一份 Markdown 操作规程——Claude Code 装入 `~/.claude/skills/` 后可按触发词自动加载；其他 AI 助手（Cursor / Codex / 任意 agent）把 `SKILL.md` 挂进自己的规则/提示体系同样可用，只是没有自动加载机制。
+Agent skill 合集，按 **Agent Skills 标准约定**（目录 + `SKILL.md` + YAML frontmatter）编写。skill 本质是一份结构化 Markdown 操作规程，各环境按下表安装即用。
 
 ## Skills
 
@@ -12,31 +10,42 @@ Agent skill 合集，按 **Claude Code skill 标准**（Anthropic Agent Skills �
 
 ## 安装
 
-**方式一：拷贝安装（最简单）**
-
-```bash
-# 整个 skill 目录拷到你的全局 skill 目录
-cp -r minigame-event-report ~/.claude/skills/
-```
-
-装完即生效（新会话自动识别），说「注册事件 / 埋点上报」即可触发，或手动 `/minigame-event-report`。
-
-**方式二：软链（想跟进更新）**
+先 clone：
 
 ```bash
 git clone https://github.com/helloworldtang/skills.git
-ln -s "$(pwd)/skills/minigame-event-report" ~/.claude/skills/minigame-event-report
+cd skills
 ```
 
-**方式三：项目级安装**（只对某个仓库生效）
+**Claude Code（全局，触发词自动加载）**
+
+```bash
+cp -r minigame-event-report ~/.claude/skills/
+# 或软链跟进更新：ln -s "$(pwd)/minigame-event-report" ~/.claude/skills/minigame-event-report
+```
+
+**Claude Code（项目级，只对该仓库生效）**
 
 ```bash
 cp -r minigame-event-report <你的项目>/.claude/skills/
 ```
 
+**Cursor**
+
+```bash
+# 放入项目规则目录，Cursor 会随项目加载
+cp minigame-event-report/SKILL.md <你的项目>/.cursor/rules/minigame-event-report.md
+```
+
+**其他 AI 助手 / 任意 agent**
+
+`SKILL.md` 就是普通 Markdown，两条路任选：
+- 把文件内容粘进你所用工具的 system prompt / 自定义指令
+- 作为项目文档放仓库里，对话中让 agent 「按 docs/minigame-event-report/SKILL.md 的流程执行」
+
 ## 使用
 
-安装后无需任何配置。对话中出现触发词（如「注册事件」「埋点上报」「reportEvent 没数据」）时 Claude 会自动加载对应 skill；也可以显式输入 `/skill名` 调用。
+Claude Code 环境装好后，对话出现触发词（「注册事件」「埋点上报」「reportEvent 没数据」）自动加载，也可显式 `/minigame-event-report` 调用；其他环境由你或你的 agent 按上文方式挂载后引用。
 
 ## 约定
 
