@@ -32,11 +32,14 @@ agent_created: true
 
 ## 第 0 步：自检（30 秒，别跳过）
 
+**下面所有命令都在本 skill 的根目录下执行**（不在时用绝对路径：`python3 <skill目录>/scripts/xxx.py`）。
+
 ```bash
-python3 scripts/doctor.py
+python3 scripts/doctor.py          # 只查依赖
+python3 scripts/doctor.py --demo   # 顺手用合成素材把四个脚本串一遍（约 20 秒）
 ```
 
-一条命令回答"这台机器还缺什么"：python / ffmpeg / ffprobe / libx264+aac / 五个必需 filter / Pillow / 中文字体 / 端到端最小编码（真编一段 0.5s 再解码）。每项失败都给能直接抄的修复命令，**有阻塞项时退出码非 0**。
+第一条回答"这台机器还缺什么"：python / ffmpeg / ffprobe / libx264+aac / 五个必需 filter / Pillow / 中文字体 / 端到端最小编码（真编一段 0.5s 再解码）。每项失败都给能直接抄的修复命令，**有阻塞项时退出码非 0**。第二条证明"不只是依赖在，链路真的通"——产物过一遍验证才算数。
 
 最容易踩的一条：`python3` 指向的解释器和装了 Pillow 的那个往往不是同一个。报告里会打 `sys.executable`——看到 `No module named 'PIL'` 先核对这一行，别急着重装。
 
@@ -45,7 +48,7 @@ python3 scripts/doctor.py
 ### 第 1 步：体检
 
 ```bash
-python3 scripts/probe.py SRC.mov --json /tmp/probe.json
+python3 scripts/probe.py SRC.mov --json probe.json
 ```
 
 读六项，其他都是背景信息：
@@ -85,6 +88,8 @@ python3 scripts/build.py SRC.mov -o out_16x9.mp4 \
 ```
 
 `build.py` 已经固定了四件事，不用再操心：CFR 转换、两遍法响度归一化（先量后算、线性不压动态）、H.264 level 按宏块数自动选、开场卡与正片一次性重编码。
+
+**上面两行的 `--start / --end / --crop` 是那一条片子的实测值**，照抄会切错位置。用自己的：`--start/--end` 来自第 1 步的静音与尾部事故时刻，`--crop` 直接抄 probe 输出的「build.py 参数」那一列。
 
 开场卡面用 `scripts/card.py`：
 

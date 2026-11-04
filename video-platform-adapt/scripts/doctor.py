@@ -209,10 +209,57 @@ def check_smoke(ffmpeg_ok: bool) -> None:
     shutil.rmtree(tmp, ignore_errors=True)
 
 
+def run_demo() -> int:
+    """端到端自证：合成素材 → probe → 开场卡 → build（内部自动调 verify）。
+
+    静态检查只能证明"依赖在"，这个能证明"四个脚本真的串得起来、参数对得上、产物过验收"。
+    第一次在陌生机器上装完，跑这一条比读十遍文档有用。
+    """
+    here = os.path.dirname(os.path.abspath(__file__))
+    tmp = tempfile.mkdtemp(prefix="vpa-demo-")
+    src = os.path.join(tmp, "src.mp4")
+    card = os.path.join(tmp, "card.png")
+    out = os.path.join(tmp, "out.mp4")
+    py = sys.executable
+
+    steps = [
+        ("合成 6s 素材", [
+            "ffmpeg", "-y", "-v", "error",
+            "-f", "lavfi", "-i", "testsrc2=size=640x480:rate=15:duration=6",
+            "-f", "lavfi", "-i", "anoisesrc=d=6:c=pink:r=48000:a=0.6",
+            "-af", "volume='if(lt(mod(t,2),1),0.05,1)':eval=frame",
+            "-c:v", "libx264", "-pix_fmt", "yuv420p", "-c:a", "aac", "-shortest", src,
+        ]),
+        ("probe.py 体检", [py, os.path.join(here, "probe.py"), src]),
+        ("card.py 开场卡", [py, os.path.join(here, "card.py"), "--ratio", "3:4",
+                       "--height", "720", "-o", card,
+                       "--line", "自检示例 · 合成素材", "--big", "OK"]),
+        ("build.py 编码 + verify", [py, os.path.join(here, "build.py"), src, "-o", out,
+                                   "--fit", "3:4", "--height", "720", "--card", card,
+                                   "--card-dur", "3", "--preset", "veryfast"]),
+    ]
+
+    print(f"\n端到端自证（合成素材，约 20 秒）→ {tmp}")
+    for i, (name, cmd) in enumerate(steps, 1):
+        t0 = time.time()
+        rc, log = sh(cmd, timeout=600)
+        print(f"  {OK if rc == 0 else BAD} {i}/{len(steps)} {pad(name, 22)}{time.time() - t0:5.1f}s")
+        if rc != 0:
+            print("\n失败步骤末尾 20 行输出：")
+            print("\n".join(log.strip().splitlines()[-20:]))
+            print(f"\n临时文件保留在 {tmp} 供排查")
+            return 1
+    print(f"\n结论：链路通，产物 {out}")
+    print(f"临时目录 {tmp}（看成品或直接删）")
+    return 0
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description="video-platform-adapt 依赖自检")
     ap.add_argument("--json", action="store_true")
     ap.add_argument("--no-smoke", action="store_true", help="跳过端到端编码")
+    ap.add_argument("--demo", action="store_true",
+                    help="静态项全绿后，用合成素材把四个脚本串一遍（约 20 秒）")
     a = ap.parse_args()
 
     print(f"video-platform-adapt 自检 · {time.strftime('%Y-%m-%d %H:%M')}")
@@ -236,14 +283,22 @@ def main() -> int:
     if a.json:
         print(json.dumps({"ok": not blocked and not warns, "blocked": blocked,
                           "warned": warns, "results": results}, ensure_ascii=False, indent=2))
+        return 1 if blocked else 0
     if blocked:
         print(f"结论：{len(blocked)} 项阻塞 —— 按上面的「修」补齐后再动手，"
               "否则 probe/build 会跑到一半才报错。")
         return 1
     if warns:
         print(f"结论：无阻塞，{len(warns)} 项提醒可忽略。")
-        return 0
-    print("结论：可用。下一步 python3 scripts/probe.py SRC.mov")
+    else:
+        print("结论：可用。")
+
+    # 打印绝对路径：调用方的 cwd 通常是自己的项目目录，写 scripts/probe.py 会找不到文件
+    here = os.path.dirname(os.path.abspath(__file__))
+    print(f"下一步：python3 {os.path.join(here, 'probe.py')} SRC.mov")
+    if a.demo:
+        return run_demo()
+    print("想确认真能干活（用合成素材把四个脚本串一遍）：加 --demo")
     return 0
 
 

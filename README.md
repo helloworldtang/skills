@@ -55,6 +55,8 @@ cp minigame-event-report/SKILL.md <你的项目>/.cursor/rules/minigame-event-re
 
 ```bash
 python3 ~/.workbuddy/skills/video-platform-adapt/scripts/doctor.py
+# 想确认不只是依赖在、链路真的通（用合成素材跑一遍，约 20 秒）：
+python3 ~/.workbuddy/skills/video-platform-adapt/scripts/doctor.py --demo
 ```
 
 ## 使用

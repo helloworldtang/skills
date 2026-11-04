@@ -21,6 +21,7 @@ import os
 import re
 import subprocess
 import sys
+import tempfile
 
 OK, BAD, WARN = "✅", "❌", "⚠️"
 
@@ -236,7 +237,7 @@ def check_first_last_frames(path: str, info: dict) -> tuple[bool, str]:
         return True, f"{WARN} 时长过短，跳过首尾帧检查"
     msgs, ok = [], True
     for label, t in (("首帧", 0.1), ("末帧", max(0.1, dur - 0.15))):
-        p = f"/tmp/.vpa_{label}_{os.getpid()}.png"
+        p = os.path.join(tempfile.gettempdir(), f".vpa_{label}_{os.getpid()}.png")
         subprocess.run(["ffmpeg", "-y", "-v", "error", "-ss", f"{t:.3f}", "-i", path,
                         "-frames:v", "1", p], capture_output=True)
         if not os.path.exists(p):
