@@ -22,6 +22,22 @@ license: MIT
 
 ## 操作步骤
 
+### 0. 前置自检（端到端跑通前先跑这个）
+
+本 skill 驱动的是外部服务（yyps + 微信素材库），依赖**环境资产**（不随 skill 分发）。使用前逐项自检，缺哪项补哪项：
+
+```bash
+# ① API key 在位？（不存在则去 wechat-writer 仓找/找管理员发）
+grep -c "API_KEY" ~/workspace/github/wechat-writer/scripts/publish_to_wechat.py
+
+# ② yyps 服务可达？
+curl -s -o /dev/null -w "%{http_code}\n" https://yyps.net/   # 期望 200/40x，超时=服务不可达
+
+# ③ 目标号在上传白名单？（account 传错会在上传时报「未知账号」——也可直接跳到步骤 2 用小图试传验证）
+```
+
+技术图表依赖的 fireworks-tech-graph 是**独立 skill**（工具型依赖，引用不内联）：缺图能力时先装它，本 skill 只管「图 → 素材 → 正文」这一段。
+
 ### 1. 找 API key
 
 yyps 的 app 通道 key 存在于 `~/workspace/github/wechat-writer/scripts/publish_to_wechat.py` 的 `API_KEY` 常量（**勿入库、勿写进任何会提交的文件**）。
