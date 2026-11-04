@@ -27,8 +27,9 @@ license: MIT
 本 skill 驱动的是外部服务（yyps + 微信素材库），依赖**环境资产**（不随 skill 分发）。使用前逐项自检，缺哪项补哪项：
 
 ```bash
-# ① API key 在位？（不存在则去 wechat-writer 仓找/找管理员发）
-grep -c "API_KEY" ~/workspace/github/wechat-writer/scripts/publish_to_wechat.py
+# ① API key 在位？（存放处各团队自定：常见于发稿脚本的 API_KEY 常量或密钥管理；
+#    没有就向 yyps 服务的管理员索取——上传与发布共用同一把 app 通道 key）
+echo "$YYPS_API_KEY" | grep -c . || grep -rc "API_KEY" <你的发稿脚本路径>
 
 # ② yyps 服务可达？
 curl -s -o /dev/null -w "%{http_code}\n" https://yyps.net/   # 期望 200/40x，超时=服务不可达
@@ -40,7 +41,7 @@ curl -s -o /dev/null -w "%{http_code}\n" https://yyps.net/   # 期望 200/40x，
 
 ### 1. 找 API key
 
-yyps 的 app 通道 key 存在于 `~/workspace/github/wechat-writer/scripts/publish_to_wechat.py` 的 `API_KEY` 常量（**勿入库、勿写进任何会提交的文件**）。
+yyps 的 app 通道 key 与 `/api/mp/publish` 投递 key 是同一把，由 yyps 服务管理员签发（各团队一般存在发稿脚本的 `API_KEY` 常量或环境变量 `YYPS_API_KEY`；**勿入库、勿写进任何会提交的文件**）。
 
 ### 2. 上传图片（每张一次调用，nonce 一次性）
 
@@ -48,7 +49,7 @@ yyps 的 app 通道 key 存在于 `~/workspace/github/wechat-writer/scripts/publ
 TS=$(date +%s); EXP=$((TS+300)); NONCE=$(uuidgen | tr -d '-' | tr 'A-F' 'a-f')
 curl -s -X POST "https://yyps.net/api/mp/materials/upload" \
   -H "x-api-key: <API_KEY>" \
-  -F "account=<danxin|ailang|mingdeng>" \
+  -F "account=<公众号 key，如 danxin>" \
   -F "file=@fig.png" \
   -F "nonce=$NONCE" -F "expires_at=$EXP"
 ```
