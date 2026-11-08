@@ -6,6 +6,7 @@ Agent skill 合集，按 **Agent Skills 标准约定**（目录 + `SKILL.md` + Y
 
 | Skill | 说明 |
 |---|---|
+| [problem-driven-article](./problem-driven-article/) | 技术问题解决型分享文的九段叙事结构：围绕一个具体问题点用假设/方案递进链推进，而非平铺知识点。含单一中心三律（一篇文章一个中心问题/概念黑箱化/陌生概念预算）、标题判据（不剧透答案、数字必兑现）、写作红线（实测值不冒充、安全网不是效果证据）。 |
 | [minigame-event-report](./minigame-event-report/) | 微信小游戏/小程序自定义事件（`wx.reportEvent`）在 We分析 的注册全流程：实测验证的操作路径、平台契约（属性全局唯一/默认属性/T+1）、事件与属性清单模板、新增埋点 checklist。 |
 | [wechat-article-images](./wechat-article-images/) | 公众号文章正文配图的 API 全链路：本地图片经 yyps app 通道传微信永久素材拿 mmbiz URL，直接内嵌 Markdown 投递草稿箱；含 multipart 参数契约（nonce/expires_at）、admin 与 app 通道鉴权边界、外链图被过滤的根因。 |
 | [video-platform-adapt](./video-platform-adapt/) | 一条录屏 → 视频号 / 小红书 / B站可直发成片：素材体检（VFR、响度、尾部录制事故、黑边）、裁切取舍、两遍法响度归一化、开场卡、六项成片验收。带四个脚本 + `doctor.py` 自检，纯本地、无 API key。 |
