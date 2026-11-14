@@ -14,6 +14,8 @@ Agent skill 合集，按 **Agent Skills 标准约定**（目录 + `SKILL.md` + Y
 | [minigame-event-report](./minigame-event-report/) | 微信小游戏/小程序自定义事件（`wx.reportEvent`）在 We分析 的注册全流程：实测验证的操作路径、平台契约（属性全局唯一/默认属性/T+1）、事件与属性清单模板、新增埋点 checklist。 |
 | [wechat-article-images](./wechat-article-images/) | 公众号文章正文配图的 API 全链路：本地图片经 yyps app 通道传微信永久素材拿 mmbiz URL，直接内嵌 Markdown 投递草稿箱；含 multipart 参数契约（nonce/expires_at）、admin 与 app 通道鉴权边界、外链图被过滤的根因。 |
 | [video-platform-adapt](./video-platform-adapt/) | 一条录屏 → 视频号 / 小红书 / B站可直发成片：素材体检（VFR、响度、尾部录制事故、黑边）、裁切取舍、两遍法响度归一化、开场卡、六项成片验收。带四个脚本 + `doctor.py` 自检，纯本地、无 API key。 |
+| [audio-debug](./audio-debug/) | macOS UI 音效排障："响了两声/像回音/多了一声 beep"先别怀疑事件双触发——录音 + 包络声爆检测 + 包络域互相关 + 系统音击数指纹表（Pop 本身就是双击结构这类冷知识）。带 record.sh / analyze.py，纯本地 ffmpeg + numpy。 |
+| [minimal-repro](./minimal-repro/) | 最小复现装置排障法：复杂系统里的局部小问题（音效/渲染/崩溃/时序），新建单文件项目只复刻嫌疑机制主链路做隔离验证，复现=坐实可快修，未复现=排除转怀疑。含驱动方式选型（CGEvent 需辅助功能权限且静默失败 vs 进程内 sendEvent 免权限）与 AppKit harness 模板。 |
 
 ## 安装
 
